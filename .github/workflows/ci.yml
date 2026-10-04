@@ -38,6 +38,18 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       run: mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -DskipTests -Dsonar.organization=roberth1982trujillo -Dsonar.projectKey=roberth1982trujillo_Rest-Cuenta-Service
+    # --- CH-07: Construcción y escaneo (faltaba esto) ---
+    - name: Construir imagen Docker localmente
+      run: docker build -t rest-cuenta-service:latest .
+    - name: Escaneo de vulnerabilidades con Trivy
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'rest-cuenta-service:latest'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        vuln-type: 'os,library'
+        severity: 'CRITICAL,HIGH'
 # --- CH-08: Automatización de Publicación de Imágenes (GHCR). ---
     - name: Iniciar sesión en GitHub Container Registry
       uses: docker/login-action@v3
